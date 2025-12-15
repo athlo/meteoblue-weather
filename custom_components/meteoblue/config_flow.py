@@ -1,7 +1,7 @@
 from homeassistant import config_entries
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
-from .const import DOMAIN, CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_SHARED_SECRET, CONF_NAME
+from .const import DOMAIN, CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_ALTITUDE, CONF_SHARED_SECRET, CONF_NAME
 
 class MeteoblueConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
@@ -20,6 +20,7 @@ class MeteoblueConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_API_KEY): str,
                 vol.Required(CONF_LATITUDE, default=self.hass.config.latitude): cv.latitude,
                 vol.Required(CONF_LONGITUDE, default=self.hass.config.longitude): cv.longitude,
+                vol.Optional(CONF_ALTITUDE, default=0): cv.positive_int,
                 vol.Optional(CONF_SHARED_SECRET): str,
             }),
             errors=errors,

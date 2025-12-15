@@ -6,7 +6,7 @@ import hashlib
 import hmac
 import time
 
-from .const import DOMAIN, CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, CONF_SHARED_SECRET
+from .const import DOMAIN, CONF_API_KEY, CONF_LATITUDE, CONF_ALTITUDE, CONF_LONGITUDE, CONF_SHARED_SECRET
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ class MeteoblueDataUpdateCoordinator(DataUpdateCoordinator):
         self.api_key = config[CONF_API_KEY]
         self.lat = config[CONF_LATITUDE]
         self.lon = config[CONF_LONGITUDE]
+        self.alt = config[CONF_ALTITUDE] if CONF_ALTITUDE in config else 0
         self.shared_secret = config.get(CONF_SHARED_SECRET)
 
     async def _async_update_data(self):
@@ -31,7 +32,8 @@ class MeteoblueDataUpdateCoordinator(DataUpdateCoordinator):
             signature = hmac.new(self.shared_secret.encode(), query.encode(), hashlib.sha256).hexdigest()
             url = f"https://my.meteoblue.com{query}&sig={signature}"
         else:
-            url = f"https://my.meteoblue.com/packages/{packages}?apikey={self.api_key}&lat={self.lat}&lon={self.lon}&format=json"
+            altStr = f"&asl={self.alt}" if self.alt else ""
+            url = f"https://my.meteoblue.com/packages/{packages}?apikey={self.api_key}&lat={self.lat}&lon={self.lon}{altStr}&format=json"
             
         async with aiohttp.ClientSession() as session:
             with async_timeout.timeout(15):

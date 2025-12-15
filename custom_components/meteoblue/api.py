@@ -16,16 +16,19 @@ class MeteoblueApiClient:
         apikey: str,
         latitude: float,
         longitude: float,
+        altitude: int,
         session: ClientSession,
     ):
         """Initialize the API client."""
         self._apikey = apikey
         self._latitude = latitude
         self._longitude = longitude
+        self._altitude = altitude
         self._session = session
         # Request packages for current weather and daily forecast
         packages = "current_basic-day"
-        self.base_url = f"https://my.meteoblue.com/packages/{packages}?lat={self._latitude}&lon={self._longitude}&apikey={self._apikey}&format=json"
+        altStr = f"&asl={self._altitude}" if self._altitude else ""
+        self.base_url = f"https://my.meteoblue.com/packages/{packages}?lat={self._latitude}&lon={self._longitude}{altStr}&apikey={self._apikey}&format=json"
 
     async def get_data(self) -> dict:
         """Get data from the Meteoblue API."""
